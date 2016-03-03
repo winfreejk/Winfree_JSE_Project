@@ -1,0 +1,20 @@
+---
+title: "OkCupid Lesson Plan"
+author: "Kevin Winfree"
+date: "3/2/2016"
+output: html_document
+---
+
+```{r}
+site <- "https://github.com/rudeboybert/JSE_OkCupid/raw/master/profiles.csv.zip"
+temp <- tempfile()
+download.file(site, temp, method = "wget")
+profiles <- read.csv(unz(temp, "profiles.csv"))
+unlink(temp)
+```
+
+```
+
+
+
+```
