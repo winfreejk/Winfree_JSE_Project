@@ -1,17 +1,210 @@
 ---
-title: "OkCupid Lesson Plan"
+title: "OkCupid Lesson"
 author: "Kevin Winfree"
-date: "3/2/2016"
+date: "3/3/2016"
 output: html_document
 ---
+#Text Processing, Mining, and Analysis of OkCupid User Profiles
+
+#The Data
+
+The we will be working with today consists of the public profiles of 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile. 
+
+Steps to read in the data:    
+1. Download the folder to your computer.    
+2. Unzip the folder by double clicking the folder.    
+3. Re-upload the `.csv` file into your `Winfree_JSE_Project` folder.    
+
+##Lab: Are there differences between the genders in what words are used in the responses to the 10 essay questions?
+```{r echo=FALSE}
+profiles <- read.csv(file="profiles.csv", header=TRUE, stringsAsFactors=FALSE)
+summary(profiles)
+```
+
+```{r echo=FALSE, comment=NA, message=FALSE}
+#Packages and commands within the packages that we will be using in this Lab.
+
+library(dplyr)      #commands associated with this package: select()
+library(stringr)    #commands associated with this package: str_replace_all(), str_detect(), str_split()
+library(mosaic)     #commands associated with this package: tally(), mosaicplot(), prop.test()
+```
+
+This chunk of code selects all of the essay columns, strings them together into a single vector and then each users vector of essay responses are separated by a space.
+```{r}
+essays <- select(profiles, starts_with("essay"))            #select the 10 essay columns as identified by the fact they starts_with("essay").    
+essays <- apply(essays, MARGIN=1, FUN=paste, collapse=" ")  #x is a user’s set of 10 essay responses and the paste() function collapses x across columns into rows while separating the elements by a space
+essays <- str_replace_all(essays, "\n", " ")                #replace all line breaks with a space
+essays <- str_replace_all(essays, "<br />", " ")            #replace all paragraph breaks with a space
+```
+
+###Determine in what percentage of male and female profiles a certain word appears.
+
+This chunk uses `str_detect()` from the `stringr` package to find how many times the word *book* appears in male and female essays and displays the proportions using `tally()`. 
+```{r}
+profiles$Has.Book <- str_detect(essays, "book")
+tally(Has.Book ~ sex, profiles, format='proportion')
+```
+
+**Your Turn:** This time choose a word that is of interest to you and see how many time the word appears in the male and female essays. Display your results in proportions. 
+```{r}
+
+```
+
+###Compare two words and give a visual representation of how often they occur in user profiles.
+Two interests of mine are "beer" and "travel". Using a `mosaicplot` I would like to see a visual comparison of how often "beer" and "travel" appear in profiles together and separately.
+```{r}
+profiles$Has.Beer <- str_detect(essays, "beer")
+profiles$Has.Travel <- str_detect(essays, "travel")
+Travel.vs.Beer <- tally(~Has.Travel + Has.Beer, data=profiles)
+mosaicplot(Travel.vs.Beer, main="", xlab="Travel", ylab="Beer")
+```
+
+**Your Turn:** Pick two words that correspond to your interests and compare them using a `mosaicplot`.
+```{r}
+
+```
+
+**Your Turn:**Describe in words what your `mosaicplot` shows you?
+
+```
+
+
+
+
+
+```
+
+###Analyze statistical significance using `prop.test`.
+Here we are going to evaluate statistical significance of the difference in the use of words between genders by using a two-sample proportions test. We will first use the word "football" and see if there is statistical significance.
+
+**Your Turn:**Write out a hypothesis test that will test the statistical significance of the word "football" between the two genders.
+
+
+$H_{0}:$
+```
+
+
+
+
+```
+$H_{A}:$
+```
+
+
+
+
+```
+```{r}
+profiles$Has.Football <- str_detect(essays, "football")
+results <- tally(~ Has.Football + sex, data=profiles)
+results
+prop.test(x=results[1, ], n=colSums(results), alternative="two.sided")
+```
+
+**Your Turn:**What are the results of your test?
+
+```
+
+
+
+
+
+
+```
+
+**Your Turn:**Now choose another word that relates to an interest of yours, perhaps a word that you used earlier, and create a test to evaluate its statistical significance between gender.
+
+
+$H_{0}:$
+```
+
+
+
+
+```
+$H_{A}:$
+```
+
+
+
+
+```
+
 
 ```{r}
-dafd
 
 ```
 
+**Your Turn:**What are the results of your test?
 ```
 
 
 
+
+
 ```
+
+
+###Most Used Words
+
+Here we will look at commonly used words among each gender.
+
+We must first subset the essays into male and female. Then sort them by frequency used in descending order.
+
+Subset male words.
+```{r}
+male.words <- subset(essays, profiles$sex == "m") %>%   #create a subset of only male essays
+str_split(" ") %>%    #split up essays into individual words seperated by a space
+unlist() %>%    #create a vector of words
+table() %>%     #compute a frequency table
+sort(decreasing=TRUE) %>%   #sort in decreasing order
+names()         #display words starting with highest frequency ones first
+```
+
+**Your Turn:**Subset female words.(Follow the same variable naming convention established for males)
+```{r}
+
+```
+
+
+**Your Turn:**Display the Top 25 most frequently used words for each gender. (Be sure to remove the eval=FALSE when you are ready to evaluate this code chunk)
+```{r eval = FALSE}
+male.words[_:__]      #display top 25 male words
+
+                      #display top 25 female words
+```
+
+**Your Turn:**What do you notice about the words? Are these words interesting or would you like to see other more descriptive words?
+```
+
+
+
+
+
+```
+
+**Your Turn:**Use the `setdiff` command to view the most frequently used words that were in the male top 500 words, but were not in the female top 500 words.(You may need to use the `?setdiff()` help file if you are unfamiliar with it and its arguments.)
+```{r eval=FALSE}
+setdiff()
+```
+
+
+
+
+
+**Your Turn:**Use the `setdiff` command to view the most frequently used words that were in the female top 500 words, but were not in the male top 500 words.(You may need to use the `?setdiff()` help file if you are unfamiliar with it and its arguments.)
+```{r eval=FALSE}
+setdiff()
+```
+
+**Your Turn:**Are there any noticable differences in the words that are used by the different genders? Any other thoughts pertaining to the word lists can be entered in the blank text box below.
+
+```
+
+
+
+
+
+
+```
+
