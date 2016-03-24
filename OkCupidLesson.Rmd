@@ -1,14 +1,14 @@
 ---
 title: "OkCupid Lesson"
 author: "Kevin Winfree"
-date: "3/3/2016"
+date: '`r format(Sys.time(), "%b %d, %Y")`'
 output: html_document
 ---
 #Text Processing, Mining, and Analysis of OkCupid User Profiles
 
 #The Data
 
-The we will be working with today consists of the public profiles of 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile. 
+The data we will be working with today consists of the public profiles of 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile. 
 
 Steps to read in the data:    
 1. Download the folder to your computer.    
@@ -16,18 +16,19 @@ Steps to read in the data:
 3. Re-upload the `.csv` file into your `Winfree_JSE_Project` folder.    
 
 ##Lab: Are there differences between the genders in what words are used in the responses to the 10 essay questions?
-```{r echo=FALSE}
+```{r}
 profiles <- read.csv(file="profiles.csv", header=TRUE, stringsAsFactors=FALSE)
 summary(profiles)
 ```
 
-```{r echo=FALSE, comment=NA, message=FALSE}
+```{r comment=NA, message=FALSE}
 #Packages and commands within the packages that we will be using in this Lab.
 
 library(dplyr)      #commands associated with this package: select()
 library(stringr)    #commands associated with this package: str_replace_all(), str_detect(), str_split()
 library(mosaic)     #commands associated with this package: tally(), mosaicplot(), prop.test()
 ```
+
 
 This chunk of code selects all of the essay columns, strings them together into a single vector and then each users vector of essay responses are separated by a space.
 ```{r}

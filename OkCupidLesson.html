@@ -63,7 +63,7 @@ img {
 <div id="header">
 <h1 class="title">OkCupid Lesson</h1>
 <h4 class="author"><em>Kevin Winfree</em></h4>
-<h4 class="date"><em>3/3/2016</em></h4>
+<h4 class="date"><em>Mar 23, 2016</em></h4>
 </div>
 
 
@@ -72,10 +72,12 @@ img {
 </div>
 <div id="the-data" class="section level1">
 <h1>The Data</h1>
-<p>The we will be working with today consists of the public profiles of 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile.</p>
+<p>The data we will be working with today consists of the public profiles of 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile.</p>
 <p>Steps to read in the data:<br />1. Download the folder to your computer.<br />2. Unzip the folder by double clicking the folder.<br />3. Re-upload the <code>.csv</code> file into your <code>Winfree_JSE_Project</code> folder.</p>
 <div id="lab-are-there-differences-between-the-genders-in-what-words-are-used-in-the-responses-to-the-10-essay-questions" class="section level2">
 <h2>Lab: Are there differences between the genders in what words are used in the responses to the 10 essay questions?</h2>
+<pre class="r"><code>profiles &lt;- read.csv(file=&quot;profiles.csv&quot;, header=TRUE, stringsAsFactors=FALSE)
+summary(profiles)</code></pre>
 <pre><code>##       age          body_type             diet              drinks         
 ##  Min.   : 18.00   Length:59946       Length:59946       Length:59946      
 ##  1st Qu.: 26.00   Class :character   Class :character   Class :character  
@@ -156,6 +158,11 @@ img {
 ##                                       
 ##                                       
 ## </code></pre>
+<pre class="r"><code>#Packages and commands within the packages that we will be using in this Lab.
+
+library(dplyr)      #commands associated with this package: select()
+library(stringr)    #commands associated with this package: str_replace_all(), str_detect(), str_split()
+library(mosaic)     #commands associated with this package: tally(), mosaicplot(), prop.test()</code></pre>
 <p>This chunk of code selects all of the essay columns, strings them together into a single vector and then each users vector of essay responses are separated by a space.</p>
 <pre class="r"><code>essays &lt;- select(profiles, starts_with(&quot;essay&quot;))            #select the 10 essay columns as identified by the fact they starts_with(&quot;essay&quot;).    
 essays &lt;- apply(essays, MARGIN=1, FUN=paste, collapse=&quot; &quot;)  #x is a user’s set of 10 essay responses and the paste() function collapses x across columns into rows while separating the elements by a space
