@@ -1,0 +1,187 @@
+\documentclass{article}
+\usepackage{fullpage, amssymb, url, natbib}
+\usepackage[colorlinks = true, linkcolor = blue, urlcolor  = blue, citecolor = blue, anchorcolor = blue]{hyperref}
+
+\setcitestyle{aysep={,}}
+
+\begin{document}
+
+
+
+
+
+
+
+\title{OkCupid Data for Introductory Statistics and Data Science Courses}
+\author{
+\normalsize Albert Y. Kim \thanks{
+  Address for correspondence: Department of Mathematics,
+  Middlebury College, Warner Hall,
+  303 College Street,
+  Middlebury, VT 05753.
+  Email: \href{mailto:aykim@middlebury.edu}{\nolinkurl{aykim@middlebury.edu}}.
+  }\\
+\footnotesize Department of Mathematics\\
+\footnotesize Middlebury College, Middlebury, VT \\
+\and
+\normalsize Adriana Escobedo-Land \\
+\footnotesize Environmental Studies-Biology Program\\
+\footnotesize Reed College, Portland, OR\\
+\normalsize
+}
+
+\maketitle
+
+\newpage
+\begin{center}
+{\Large OkCupid Data for Introductory Statistics and Data Science Courses}
+\end{center}
+\subsection*{Abstract}
+We present a data set consisting of user profile data for 59,946 San Francisco OkCupid users (a free online dating website) from June 2012.  The data set includes typical user information, lifestyle variables, and text responses to 10 essays questions.  We present four example analyses suitable for use in undergraduate introductory probability and statistics and data science courses that use R.  The statistical and data science concepts covered include basic data visualization, exploratory data analysis, multivariate relationships, text analysis, and logistic regression for prediction.
+
+\vspace{.1in}
+
+Keywords:  OkCupid, online dating, data science, big data, logistic regression, text mining.
+\newpage
+
+
+
+
+%------------------------------------------------------------------------------
+%
+\section{Introduction}\label{intro}
+%
+%------------------------------------------------------------------------------
+Given that the field of data science is gaining more prominence in academia and industry, many statisticians are arguing that statistics needs to stake a bigger claim in data science in order to avoid marginalization by other disciplines such as computer science and computer engineering \citep{DAVIDSON:2014,YU:2014}.  The importance of emphasizing data science concepts in the undergraduate curriculum is stressed in the American Statistical Association's (ASA) most recent Curriculum Guidelines for Undergraduate Programs in Statistical Science \citep{ASA:Guidelines}.
+
+While precise definition of the exact difference between statistics and data science and its implications for statistics education can be debated \citep{WICKHAM:2014}, one consensus among many in statistics education circles is that at the very least statistics needs to incorporate a heavier computing component and increase the use of technology for both developing conceptual understanding and analyzing data \citep{GAISE:05, NOLAN:LANG:2010}.  Relatedly, in the hopes of making introductory undergraduate statistics courses more relevant, many statistics educators are placing a higher emphasis on the use of real data in the classroom, a practice the ASA's Guidelines for Assessment and Instruction in Statistics Education (GAISE) project's report strongly encourages \citep{GAISE:05}.  Of particular importance to the success of such ambitions are the data sets considered, as they provide the context of the analyses and thus will ultimately drive student interest \citep{GOULD:2010}.
+
+It is in light of these discussions that we present this paper centering on data from the online dating website OkCupid, specifically a snapshot of San Francisco California users taken on June 2012.  We describe the data set and present a series of example analyses along with corresponding pedagogical discussions.  The example analyses presented in this paper were used in a variety of settings at Reed College in Portland, Oregon: a 90 minute introductory tutorial on R, an introductory probability and statistics course, and a follow-up two-hundred level data science course titled ``Case Studies in Statistical Analysis.''  The statistical and data science concepts covered include basic data visualization, exploratory data analysis, multivariate relationships, text analysis, and logistic regression for prediction.  All examples are presented using the R statistical software program and make use of the \verb#mosaic#, \verb#dplyr#, \verb#stringr#, and \verb#ggplot2# packages \citep{mosaic, ggplot2, stringr, dplyr}.
+
+
+
+
+
+
+
+
+%------------------------------------------------------------------------------
+%
+\section{Data}
+%
+%------------------------------------------------------------------------------
+The data consists of the public profiles of 59,946 OkCupid users who were living within 25 miles of San Francisco, had active profiles on June 26, 2012, were online in the previous year, and had at least one picture in their profile.  Using a Python script, data was scraped from users' public profiles on June 30, 2012; any non-publicly facing information such as messaging was not accessible.
+
+Variables include typical user information (such as sex, sexual orientation, age, and ethnicity) and lifestyle variables (such as diet, drinking habits, smoking habits).  Furthermore, text responses to the 10 essay questions posed to all OkCupid users are included as well, such as ``My Self Summary,'' ``The first thing people usually notice about me,'' and ``On a typical Friday night I am...''  For a complete list of variables and more details, see the accompanying codebook \verb#okcupid_codebook.txt#.  We load the data as follows:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{profiles} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}\hlkwc{file}\hlstd{=}\hlstr{"profiles.csv"}\hlstd{,} \hlkwc{header}\hlstd{=}\hlnum{TRUE}\hlstd{,} \hlkwc{stringsAsFactors}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in file(file, "{}rt"{}): cannot open the connection}}\begin{alltt}
+\hlstd{n} \hlkwb{<-} \hlkwd{nrow}\hlstd{(profiles)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in nrow(profiles): object 'profiles' not found}}\end{kframe}
+\end{knitrout}
+
+Analyses of similar data has received much press of late, including Amy Webb's TED talk ``How I Hacked Online Dating'' \citep{TED} and Wired magazine's ``How a Math Genius Hacked OkCupid to Find True Love.'' \citep{Wired}  OkCupid co-founder Christian Rudder pens periodical analyses of OkCupid data on the blog OkTrends (\url{http://blog.okcupid.com/}) and has recently published a book ``Dataclysm: Who We Are When We Think No One's Looking'' describing similar analyses \citep{dataclysm}.  Such publicity surrounding data-driven online dating and the salience of dating matters among students makes this data set one with much potential to be of interest to students, hence facilitating the instruction of statistical and data science concepts.
+
+Before we continue we note that even though this data consists of publicly facing material, one should proceed with caution before scraping and using data in fashion similar to ours, as the Computer Fraud and Abuse Act (CFAA) makes it a federal crime to access a computer without authorization from the owner \citep{Pando:2014}.  In our case, permission to use and disseminate the data was given by its owners (See Acknowledgements).
+
+
+
+
+
+
+
+
+
+
+%------------------------------------------------------------------------------
+%
+\section{Example Analyses}\label{analyses}
+%
+%------------------------------------------------------------------------------
+We present example analyses that address the following questions:
+
+\begin{enumerate}
+\item How do the heights of male and female OkCupid users compare?
+\item What does the San Francisco online dating landscape look like?  Or more specifically, what is the relationship between users' sex and sexual orientation?
+\item Are there differences between the sexes in what words are used in the responses to the 10 essay questions?
+\item How accurately can we predict a user's sex using their listed height?
+\end{enumerate}
+
+For each question, we present an exercise as would be given to students in a lab setting, followed by a pedagogical discussion.
+
+
+%---------------------------------------------------------------
+\subsection{Male and Female Heights}\label{section_height}
+%---------------------------------------------------------------
+\subsubsection{Exercise}
+We compare the distribution of male and female OkCupid users' heights.  Height is one of 3 numerical variables in this data set (the others being age and income).  This provides us an opportunity to investigate numerical summaries using the \verb#favstats()# function from the \verb#mosaic# package:
+
+\begin{center}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{require}\hlstd{(mosaic)}
+\hlkwd{favstats}\hlstd{(height,} \hlkwc{data}\hlstd{=profiles)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): could not find function "{}favstats"{}}}\end{kframe}
+\end{knitrout}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
